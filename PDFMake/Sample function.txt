@@ -1,0 +1,237 @@
+printPDF( 
+          records,
+          total_manpower,
+          total_indefinite_leave,
+          total_m_and_p_leave,
+          total_bereavement_leave,
+          total_swap_leave,
+          total_others,
+          total_counted_employee,
+          total_present_employee,
+          total_attendance_rate,
+          dateFrom,
+          dateTo,
+          company
+         )
+         {
+
+          if( !this.selCompany ) {
+             swal("Please Select Company", " " , "warning", {
+                     timer: 1200,
+                     button: false  
+             })
+            return false
+          } 
+
+
+          let CompanyName = company
+
+          let PrintCutoffMonth = `${this.formatNameDate(dateFrom)} - ${this.formatNameDate(dateTo)}`
+          
+          let myData = records.map(rec=>{
+             return{
+               Company: rec.Company,
+               Department: rec.Department,
+               NumberOfEmployees: rec.NumberOfEmployees,
+               IndefiniteLeave: rec.IndefiniteLeave,
+               MAndP_Leave: rec.MAndP_Leave,
+               BereavementLeave: rec.BereavementLeave,
+               Swap: rec.Swap,
+               Others: rec.Others,
+               CountedEmployee: rec.CountedEmployee,
+               Present: rec.Present,
+               AttendanceRate: rec.AttendanceRate
+             }
+           })
+
+          myData.push({
+             Company: 'Total',
+             Department: 'Total',
+             NumberOfEmployees:total_manpower,
+             IndefiniteLeave: total_indefinite_leave,
+             MAndP_Leave: total_m_and_p_leave,
+             BereavementLeave: total_bereavement_leave,
+             Swap: total_swap_leave,
+             Others: total_others,
+             CountedEmployee: total_counted_employee,
+             Present: total_present_employee,
+             AttendanceRate: total_attendance_rate
+          })
+
+          
+           function buildTableBody(data, columns) {
+              var body = []
+              body.push(columns)
+              data.forEach(function(row){
+                  var dataRow = [];
+                  columns.forEach(function (column) {
+                      dataRow.push({ 
+                        text:row[column],
+                        bold: column == 'AttendanceRate' && row.Company == 'Total' ? true : false,
+                        color: column == 'AttendanceRate' && row.Company == 'Total' ? 'black' :
+                               column == 'Present' && row.Company == 'Total' ? 'white' : 
+                               column == 'CountedEmployee' && row.Company == 'Total' ? 'white' :
+                               column == 'Others' && row.Company == 'Total'? 'white': 
+                               column == 'Swap' && row.Company == 'Total' ? 'white': 
+                               column == 'BereavementLeave' && row.Company == 'Total' ? 'white' :
+                               column == 'MAndP_Leave' && row.Company == 'Total'? 'white' : 
+                               column == 'IndefiniteLeave' && row.Company == 'Total' ? 'white' : 
+                               column == 'NumberOfEmployees' && row.Company == 'Total' ? 'white' :
+                               column == 'Department' && row.Company == 'Total' ? 'white' : 
+                               column == 'Company' && row.Company == 'Total'? 'white' : '',
+                        fillColor: column == 'AttendanceRate' && row.Company == 'Total' ? 'yellow' :
+                                   column == 'Present' && row.Company == 'Total' ? '#213b57' : 
+                                   column == 'CountedEmployee' && row.Company == 'Total' ? '#213b57' :
+                                   column == 'Others' && row.Company == 'Total' ? '#213b57' :
+                                   column == 'Swap' && row.Company == 'Total'? '#213b57' : 
+                                   column == 'BereavementLeave' && row.Company == 'Total' ? '#213b57' : 
+                                   column == 'MAndP_Leave' && row.Company == 'Total' ? '#213b57': 
+                                   column == 'IndefiniteLeave' && row.Company == 'Total' ? '#213b57' : 
+                                   column == 'NumberOfEmployees' && row.Company == 'Total' ? '#213b57' : 
+                                   column == 'Department' && row.Company == 'Total' ? '#213b57' : 
+                                   column == 'Company' && row.Company == 'Total'? '#213b57' : '',
+                        alignment: column == 'Department' ? 'left': 'center'                                    
+                      });
+                  })
+                  body.push(dataRow);
+              })
+              
+              // Table Headers
+              // columns[0] = { text:'Company', alignment: 'center', bold: false , fillColor: '#213b57', color: 'white'},
+              columns[0] = { text:'Department(s)', alignment: 'center', bold: false , fillColor: '#213b57', color: 'white'},
+              columns[1] = { text:'Manpower', alignment: 'center', bold: false , fillColor: '#213b57', color: 'white'},
+              columns[2] = { text:'Indefinite Leave', alignment: 'center', bold: false , fillColor: '#213b57', color: 'white'},
+              columns[3] = { text:'Maternity/Paternity Leave', alignment: 'center', bold: false , fillColor: '#213b57', color: 'white'},
+              columns[4] = { text:'Bereavement Leave', alignment: 'center', bold: false , fillColor: '#213b57', color: 'white'} ,
+              columns[5] = { text:'SWAP', alignment: 'center', bold: false , fillColor: '#213b57', color : 'white'},
+              columns[6] = { text:'Others', alignment: 'center', bold: false, fillColor : '#213b57', color: 'white'},
+              columns[7] = { text:'Counted Employee', alignment: 'center', bold: false, fillColor: '#213b57', color: 'white'},
+              columns[8] = { text:'Present', alignment: 'center', bold: false, fillColor: '#213b57', color: 'white'} ,
+              columns[9] = { text:'Attendance Rate(%)', alignment: 'center', bold: false , fillColor: '#213b57', color:'white'}
+
+              return body
+         }
+
+         function table(data, columns) {
+              return {
+                  style: 'alignmentLeft',
+                  table: {
+                      widths: ['15%', '10%', '10%', '11%', '12%','5%','7%','10%','8%', '12%'],
+                      headerRows: 1,
+                      body: buildTableBody(data, columns),
+                  },
+                
+              };
+         }
+
+         pdfMake.fonts = {
+            MSGothic:{
+              normal: 'MSGothic.ttf',
+              bold: 'MSGothic.ttf',
+              italics: 'MSGothic.ttf',
+              bolditalics: 'MSGothic.ttf'
+            },
+            seguisym: {
+                normal: 'seguisym.ttf',
+                bold: 'seguisym.ttf',
+                italics: 'seguisym.ttf',
+                bolditalics: 'seguisym.ttf'
+            }
+
+          }
+
+          var dd = {
+             pageSize: 'A4',
+             pageOrientation: 'portrait',
+             pageMargins: [ 10, 10, 10 , 10],
+             content: [
+
+               { 
+                 text: `${CompanyName} \n Attendance Report Summary`,
+                 style: 'header',    
+               },
+
+               {
+                 columns: [
+                    {
+                      text: `Cutoff Month: ${PrintCutoffMonth}`,
+                      alignment: 'left',
+                      fontSize: 10,
+                      color:'black'            
+                    }      
+                 ]
+               },
+
+            
+               { 
+                text: ' ',
+               },
+         
+               table(myData, ['Department', 'NumberOfEmployees','IndefiniteLeave', 'MAndP_Leave', 'BereavementLeave', 'Swap', 'Others','CountedEmployee', 'Present','AttendanceRate'], {
+                      // pageBreak: 'before'
+                }),
+
+               {
+                  text: `********************************* Nothing Follows ********************************* \n ${moment().format("YYYY-MM-DD HH:mm:ss")}`,
+                  style: 'subheader',
+                  italics: true
+               },
+             ],
+             styles: {
+                    imageStyle:{
+                      border: '5px solid black'
+                    },
+                    header: {
+                        fontSize: 15,
+                        bold: true,
+                        margin: [0, 0, 0, 10],
+                        alignment:'center',
+                        color:'black'
+
+                    },
+                    subheader: {
+                        fontSize: 10,
+                        bold: false,
+                        margin: [0, 10, 0, 5]
+                    },
+                    // tableExample: {
+                    //     margin: [0, 5, 0, 15],
+                    //     width: ['*', 50, '*', '*', 50, '*']
+                    // },
+                    tableHeader: {
+                        bold: true,
+                        fontSize: 13,
+                        color: 'black'
+                    }
+                },
+                
+                defaultStyle: {
+                        // font: 'MSGothic',
+                        font: 'seguisym',
+                        fontSize: 10,
+                        alignment:'center',
+                },   
+
+                 footer: function(currentPage, pageCount) {
+                      return {
+                       
+                          columns: [
+                          {
+                              fontSize: 11,
+                              text:[
+                              {
+                              text: 'Page ' + currentPage.toString() + ' of ' + pageCount,
+                              }
+                              ],
+                              alignment: 'center'
+                          }
+                          ]
+                      };
+                  },
+          }
+
+           pdfMake.createPdf(dd).open() 
+
+
+
+        }

@@ -1,0 +1,41 @@
+CREATE PROCEDURE GetAbsentsToday AS 
+
+	/* Local Variable Declaration */
+	DECLARE @TotalAbsents INT
+	DECLARE @CurrentTime VARCHAR(50)
+	
+	
+	/* Store Total Count from SD_SQL_TRAINING.GitlabMonitoring.dbo.Absents */
+	SELECT		@TotalAbsents = count(*)
+	FROM		SD_SQL_TRAINING.GitlabMonitoring.dbo.Absents
+	WHERE		YEAR(Absents.AbsentDate) = YEAR(getdate())
+				AND	MONTH(Absents.AbsentDate) = MONTH(getdate())
+				AND	DAY(Absents.AbsentDate) = DAY(getdate())
+				
+			
+	/* Store Current Time */
+	SET @CurrentTime = CAST(getdate() AS time)
+	
+	
+	/* Check if (Total Count > 0) AND (Current Time > Saving Time) */
+	IF @TotalAbsents <= 0 AND @CurrentTime >= '15:00:00'
+	
+	
+	/* Insert Data into Table*/
+		INSERT INTO Absents
+		
+				SELECT		Users.ID AS GitLab_ID,
+							Users.EmployeeCode,
+							Users.Name AS EmployeeName,
+							LogTime.LogDate AS AbsentDate,
+							LogTime.TimeIn
+				FROM		SD_SQL_TRAINING.GitlabMonitoring.dbo.Users	AS Users
+				INNER JOIN	HRDSQL.CompanyInformation.dbo.LogTime		AS LogTime
+							ON Users.EmployeeCode = LogTime.EmployeeCode
+				WHERE		LogTime.TimeIn IS NULL
+							AND YEAR(LogTime.LogDate) = YEAR(getdate())
+							AND MONTH(LogTime.LogDate) = MONTH(getdate())
+							AND DAY(LogTime.LogDate) = DAY(getdate())
+
+GO
+

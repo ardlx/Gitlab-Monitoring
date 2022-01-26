@@ -1,0 +1,89 @@
+1. Copy *examples folder*  to  => client/node_modules/pdfmake
+
+2. Open command prompt in => client/node_modules/pdfmake
+
+3. Type yarn install to install node_modules
+
+4. Type gulp buildFonts to check if gulp is already installed
+
+	4.1. If gulp is not yet installed, type yarn global add gulp
+	
+	4.2 Type gulp buildFonts to check if gulp is already installed
+	
+5. Type yarn serve on client
+
+6. Copy the following to script:
+===========================================================================================================================================================
+					import pdfMake from "pdfmake/build/pdfmake";
+					import pdfFonts from "pdfmake/build/vfs_fonts";
+					pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+7. Create Function: 
+===========================================================================================================================================================
+			***************************************************************
+			***** Refer to https://pdfmake.github.io/docs/0.1/ *****
+			***************************************************************
+
+
+					PrintPDF(){
+
+						// Table Body
+						function buildTableBody(data, columns){
+						  var body = []
+						  body.push(columns)
+						  data.forEach(function(row){
+							var dataRow = []
+							columns.forEach(function (column) {
+							  dataRow.push({ text:row[column], fontSize: 9, alignment: column == ' * COLUMN NAME * ' || column == ' * COLUMN NAME * ' ? 'left' : 'center' })
+							})
+							body.push(dataRow)
+						  })
+
+						  // Table Headers
+						  columns[0] = { text:' * COLUMN NAME * ', alignment: 'center', bold: true , fillColor: 'gray', color: 'white'},
+						  columns[1] = { text:' * COLUMN NAME * ', alignment: 'center', bold: true , fillColor: 'gray', color: 'white'},
+						  columns[2] = { text:' * COLUMN NAME * ', alignment: 'center', bold: true , fillColor: 'gray', color: 'white'},
+						  columns[3] = { text:' * COLUMN NAME * ', alignment: 'center', bold: true , fillColor: 'gray', color: 'white'},
+						  columns[4] = { text:' * COLUMN NAME * ', alignment: 'center', bold: true , fillColor: 'gray', color: 'white'} ,
+						  columns[5] = { text:' * COLUMN NAME * ', alignment: 'center', bold: true , fillColor: 'gray', color: 'white'}
+						  return body
+						}
+
+						// Column Width
+						function table(data, columns){
+						  return {
+							  table: { widths: ['10%', '30%', '25%', '12%', '8%','15%'], headerRows: 1, body: buildTableBody(data, columns), },
+						  };
+						}
+
+						// Font
+						pdfMake.fonts = {
+						  seguisym: { normal: 'seguisym.ttf', bold: 'seguisym.ttf', italics: 'seguisym.ttf', bolditalics: 'seguisym.ttf' }
+						}
+
+						// Page Properties
+						var PrintData = {
+						  pageSize: 'A4',
+						  pageOrientation: 'portrait',
+						  pageMargins: [ 10, 10, 10, 20],
+						  content: [ { text: ` * PAGE HEADER TEXT * `, style: 'header', },
+									 { text: ` *  PAGE SUBHEADER TEXT* `, style: 'subheader', },
+									   table( * DATA VARIABLE * , [' * COLUMN NAME * ', ' * COLUMN NAME * ', ' * COLUMN NAME * ', ' * COLUMN NAME * ', ' * COLUMN NAME * ', ' * COLUMN NAME * '], {  }), ],
+
+						  // Content Properties
+						  styles: { header: { margin: [0, 0, 0, 5], fontSize: 15, alignment:'center', bold: true, color:'black' },
+									subheader: { margin: [0, 0, 10, 5], fontSize: 9, alignment:'right', bold: true, color:'black' },  },
+
+						  defaultStyle: { font: 'seguisym', fontSize: 10, alignment:'center', },
+
+						  // Page Numbering
+						  footer: function(currentPage, pageCount) {
+							return {
+							  columns: [ { height: 5, fontSize: 9, alignment: 'center', text:[ { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, } ] } ]
+							};
+						  },
+						}
+
+						// PDF Printing Execution
+						pdfMake.createPdf(PrintData).open() 
+					},
